@@ -118,13 +118,19 @@ def main():
         required=True,
         nargs='+'
     )
-    parser_qc.add_argument(
+    parser_qc_finch = parser_qc.add_mutually_exclusive_group()
+    parser_qc_finch.add_argument(
         "--finchdb",
         type=str,
-        required=True,
         help="path to the Finch sketch file(s) (.sk)",
         nargs='+',
         metavar="finchsketch.sk"
+    )
+    parser_qc_finch.add_argument(
+        "--exclude_finch",
+        action='store_true',
+        default=False,
+        help=f"Do not do taxonomic analysis. Much faster but greatly reduced accuracy"
     )
     parser_qc.add_argument(
         "--taxadb",
@@ -151,11 +157,11 @@ def main():
         help=f"output directory"
     )
     parser_qc.add_argument(
-        "-w",
-        "--window",
+        "-f",
+        "--filter_threshold",
         type=int,
         default=5000,
-        help=f"Size of slicing window for GC statistics",
+        help=f"Filters sequences of sizes below the threshold.",
         metavar="[int]"
     )
     parser_qc.add_argument(
@@ -175,6 +181,7 @@ def main():
     parser_qc.set_defaults(func=qc.run)
 
     args = parser.parse_args()
+    args.window = args.filter_threshold//2
 
     try:
         if args.version:
