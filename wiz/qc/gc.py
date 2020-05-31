@@ -29,8 +29,6 @@ def average_gc(sequence, window=-1):
     average = []
     if window == -1:
         window = len(sequence)
-    else:
-        window = window 
     if tools.check_window_size(sequence, window):
         lenght = len(sequence)
         for pos in range(0, lenght, window):
