@@ -29,25 +29,27 @@ def average_gc(sequence, window=-1):
     average = []
     if window == -1:
         window = len(sequence)
+    else:
+        window = window 
     if tools.check_window_size(sequence, window):
         lenght = len(sequence)
         for pos in range(0, lenght, window):
             if pos+window <= lenght:
                 average.append(GC(sequence[pos:pos+window]))
-    # ! Warning If the user enters exactly the same size of window
-    # ! as the size of the smallest sequence the program may crash
-    # TODO fix that
     if window == len(sequence):
         return average[0]
     return average
 
 
-def bounds(averages, percent=-1):
+def bounds(contigs, percent=-1):
     """
     Based on a list of averages, the function calculates the X and Y
     percentile bounds defined by the percent = [X, Y] parameter.
     By default X = 5 and Y = 95
     """
+    averages = []
+    for contig in contigs:
+        averages+=contig.gc_cutouts
     if percent == -1:
         percent = [5, 95]
     bound_1 = percentile(averages, percent[0])

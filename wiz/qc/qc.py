@@ -38,7 +38,10 @@ def run(args):
                 contigs = []
 
                 for record in fasta_file:
-                    contigs.append(Contig(record, args.window))
+                    if len(record.seq)>=args.filter_threshold:
+                        contigs.append(Contig(record, args.window))
+                    else:
+                        logger.warn(f" The contig {record.id} is not used because of its size less than {args.filter_threshold}bp")
 
                 genome_bin = Bins(genome_file, contigs)
                 bins.append(genome_bin)
@@ -69,11 +72,12 @@ def run(args):
 
             # # taxonomic analysis
             # TODO uncomment before release
-            for contig in b.contigs:
-                contig.taxonomy = taxonomy.taxonomy(
-                    contig.uid,
-                    contig.sequence,
-                    args)
+            if not args.exclude_finch:
+                for contig in b.contigs:
+                    contig.taxonomy = taxonomy.taxonomy(
+                        contig.uid,
+                        contig.sequence,
+                        args)
 
             # # Implementation of phylogenic analysis in the bad module
             # # phylogenic analysis based on prodigal output

@@ -23,9 +23,8 @@ class Contig:
         self.sequence = contig.seq
         # these values are computed during initialisation
         self.length = len(self.sequence)
-        self.gc_contig = gc.average_gc(self.sequence, self.length)
+        self.gc_contig = gc.average_gc(self.sequence, -1)
         self.gc_cutouts = gc.average_gc(self.sequence, window)
-        self.gc_bounds = gc.bounds(self.gc_cutouts)
         self.tetranucl = tetra.tetranuc_count(self.sequence)
         # these variables are defined after initialization
         self.coding_density = -25
@@ -44,6 +43,7 @@ class Bins:
         self.path = path
         # The contigs variable is a contig object list
         self.contigs = contigs
+        self.gc_bounds = gc.bounds(self.contigs)
 
 
 # TODO Move the contigs GC bounds computation to the whole bins and adapt

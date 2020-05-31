@@ -38,7 +38,10 @@ class Header:
         self.window = args.window
         self.cpu = args.c
         # self.force = args.force
-        self.finch = args.finchdb
+        if args.exclude_finch:
+            self.finch = ["Taxonomic analysis has not been performed"]
+        elif args.finchdb != None:
+            self.finch = args.finchdb
         self.taxadb = args.taxadb
 
 
@@ -51,7 +54,7 @@ class BinData:
         self.path = b.path
         self.contigs = b.contigs
         self.window = args.window
-        self.gc_map = graphs.scatter_gc(b.contigs, args.window)
+        self.gc_map = graphs.scatter_gc(b, args.window)
         self.gc_density = graphs.distplot_gc(b.contigs)
         self.coding_density = graphs.scatter_gc_coding_density(b.contigs)
         self.tetra_heatmap = graphs.dendrogram_tetra(b.contigs, args.c)

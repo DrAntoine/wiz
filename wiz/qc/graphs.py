@@ -32,12 +32,12 @@ def extract_values(contigs):
     objects and compiles them in list form to be exploited by chart
     drawing functions
     """
-    gc_averages, contig_name, gc_bounds = [], [], []
+    gc_averages, contig_name = [], []
     for contig in contigs:
         gc_averages.append(contig.gc_cutouts)
         contig_name.append(contig.uid)
-        gc_bounds.append(contig.gc_bounds)
-    return (gc_averages, contig_name, gc_bounds)
+        # gc_bounds.append(contig.gc_bounds)
+    return (gc_averages, contig_name)
 
 
 def order_magnitude(number):
@@ -65,7 +65,7 @@ def round_value(number):
     return numeric_value
 
 
-def scatter_gc(contigs, window_size):
+def scatter_gc(b, window_size):
     """
     Draw a graph with the proportion of GC along a set of contigs measured
     by x-base segment. The contigs parameter represents a contig object
@@ -75,20 +75,20 @@ def scatter_gc(contigs, window_size):
     """
     logger.debug("drawing scatter_gc graph")
 
-    gc_averages, contigs_name, contigs_bounds = extract_values(contigs)
+    gc_averages, contigs_name = extract_values(b.contigs)
     plotdata = []
-
-    for averages, name, bounds in zip(
-            gc_averages, contigs_name, contigs_bounds):
+    max_len_average = 0
+    for averages, name in zip(
+            gc_averages, contigs_name):
         # if multiple value in seq
         if isinstance(averages, list):  # type(seq) == list:
-            position = [i*window_size for i in range(0, len(averages))]
-        # if seq contain a unique value, is not a list but a float
-        # we need list for the graph
+            logger.debug(f"{len(averages)},{max_len_average}")
+            position = [i*(window_size) for i in range(0, len(averages))]
         else:
             position = [window_size]
             averages = [averages]
-
+        if len(averages) > max_len_average:
+            max_len_average = len(averages)
         plotdata.append(Scatter(
             x=position,
             y=averages,
@@ -96,26 +96,27 @@ def scatter_gc(contigs, window_size):
             mode='markers',
             marker=dict(size=3)))
 
-        y_down = [bounds[0] for i in range(0, len(averages))]
-        y_up = [bounds[1] for i in range(0, len(averages))]
+    x_bound =[(i)*(window_size) for i in range(0, max_len_average+2)]
+    y_down = [b.gc_bounds[0] for i in x_bound]
+    y_up = [b.gc_bounds[1] for i in x_bound]
 
-        plotdata.append(Scatter(
-            x=position,
-            y=y_down,
-            name=name+" bounds",
-            mode='lines',
-            line=dict(width=1),
-            opacity=0.25,
-            showlegend=False))
+    plotdata.append(Scatter(
+        x=x_bound,
+        y=y_down,
+        name="5th percentil",
+        mode='lines',
+        line=dict(width=2),
+        opacity=1,
+        showlegend=False))
 
-        plotdata.append(Scatter(
-            x=position,
-            y=y_up,
-            name=name+" bounds",
-            mode='lines',
-            line=dict(width=1),
-            opacity=0.25,
-            showlegend=False))
+    plotdata.append(Scatter(
+        x=x_bound,
+        y=y_up,
+        name="95th percentil",
+        mode='lines',
+        line=dict(width=2),
+        opacity=1,
+        showlegend=True))
 
     layout = Layout(  # * Try to change scatter in plot or bar
         title=f"Average GC per windows of {order_magnitude(window_size)}",
@@ -179,20 +180,15 @@ def distplot_gc(contigs):
     """
 
     logger.debug("drawing distplot_gc graph")
-
-    gc_averages, seq_names, _ = extract_values(contigs)
-    values_debug = [len(i) for i in gc_averages]
-    logger.debug(f"distplot_gc: {len(seq_names)} | {values_debug}")
-    # TODO fix bug here, if a contig have a only one value for averages_gc
-    # this next line crash
+    
+    gc_averages, seq_names = extract_values(contigs)
     fig = distplot(gc_averages, seq_names, show_hist=False)
-
     fig['layout'].update(
         title="Reads ratio per GC average",
         xaxis=dict(title="Average of GC", range=[20, 80]),
         yaxis=dict(title="Relative amount of reads", range=[0, 1])
     )
-    # plot(fig) #* Debug line to plot directly
+    #plot(fig) #* Debug line to plot directly
     # in default internet explorer the graph
 
     logger.debug("drawing succesful")

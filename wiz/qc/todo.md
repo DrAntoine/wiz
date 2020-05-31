@@ -45,8 +45,7 @@ None
 * [X] Fixing ploting bug
 ### scatterplot graph :
 * [X] Changing scatterplot graph in plot graph
-* [ ] make a colorgroup with each couple sequence bounds
-* [ ] mask name of bound in legend
+
 ### tetraplot graph :
 * [X] Make a heatmap with proportion in each tetranuc
 * [X] Make a heatmap with relative proportion for each tetranucl for each contig # ! Amount of data too large to display numeric values

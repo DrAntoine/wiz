@@ -38,6 +38,8 @@ def create_dirs(output, force_overwrite):
 
 
 def check_window_size(sequence, window_size):
+    #TODO check if this section is always required with the change args.windows = args.threshold//2 
+    #Perhaps needed if we add an option to load sequence without thershold_filter 
     """
     check the value of the window size and the length of the sequence
     the window_size must be 0 < size <= lenght(sequence)
